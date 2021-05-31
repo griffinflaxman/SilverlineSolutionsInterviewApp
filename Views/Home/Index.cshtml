@@ -1,0 +1,207 @@
+﻿@model List<SilverlineSolutionsInterviewApp.Models.Recipe>
+@{
+    ViewBag.Title = "Recipe Page";
+}
+
+<!-- Add New Modal -->
+<div class="modal fade" id="addNewModal" tabindex="-1" aria-labelledby="addNewLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="addNewLabel">Add Recipe</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            @using (Html.BeginForm("AddNewRecipe", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "addForm" }))
+            {
+                <div class="modal-body">
+                    <div class="mb-1">
+                        @Html.Label("Recipe Name: ")
+                        @Html.Editor("Name")
+                    </div>
+                    <div class="mb-1">
+                        @Html.Label("Recipe Image: ")
+                        <input type="file" name="Image">
+                    </div>
+                    <div>
+                        @Html.Label("Recipe Ingredients: ")
+                        <div>@Html.TextArea("Ingredients", string.Empty, 2, 37, new { })</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn btn-outline-dark toolbar-btns-width" value="Add">
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="editLabel">Edit Recipe</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            @using (Html.BeginForm("EditRecipe", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "editForm" }))
+            {
+                <div class="modal-body">
+                    <div hidden>@Html.Hidden("ID", string.Empty)</div>
+                    <div class="mb-1">
+                        @Html.Label("Recipe Name: ")
+                        @Html.Editor("Name")
+                    </div>
+                    <div class="mb-1">
+                        @Html.Label("Recipe Image: ")
+                        <input type="file" name="Image">
+                    </div>
+                    <div>
+                        @Html.Label("Recipe Ingredients: ")
+                        <div>@Html.TextArea("Ingredients", string.Empty, 2, 37, new { })</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn btn-outline-dark toolbar-btns-width" value="Save Changes">
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="deleteLabel">Delete Recipe</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            @using (Html.BeginForm("DeleteRecipe", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "deleteForm" }))
+            {
+                <div class="modal-body">
+                    @Html.Hidden("ID", string.Empty)
+                    <h5>Are you sure you want to remove the following recipe?</h5>
+                    <p class="mt-2">&#9;<em><label name="Name"></label></em></p>
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn btn-outline-dark toolbar-btns-width" value="Confirm">
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="col-12 d-flex flex-column justify-content-center align-items-center mb-2">
+    <h1 class="text-white text-center">Recipe List</h1>
+    <div class="d-flex flex-row">
+        <button class="btn btn-outline-light toolbar-btns-width m-1" id="addNewBtn" data-bs-toggle="modal" data-bs-target="#addNewModal">Add New</button>
+        <button class="btn btn-outline-light toolbar-btns-width m-1" id="editBtn" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button>
+        <button class="btn btn-outline-light toolbar-btns-width m-1" id="deleteBtn" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
+    </div>
+</div>
+
+@if (Model.Count > 0)
+{
+    <div class="d-flex flex-row">
+        <div class="col-6 d-flex flex-column gap-1 p-1">
+            @for (var i = 0; i < Model.Count; i += 2)
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex flex-column">
+                            <input type="radio" name="selection" data-recipe_id="@Model[i].ID" data-recipe_name="@Model[i].Name" data-recipe_ingredients="@Model[i].Ingredients">
+                            <h1 class="text-center">@Model[i].Name</h1>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-row">
+                            <img width="200" height="150" src="@string.Concat("/Content/Images/", Model[i].ImageFile)">
+                            <div class="d-flex flex-column" style="margin-left: 20%;">
+                                <h3 class="card-title">Ingredients</h3>
+                                <ol>
+                                    @foreach (var ingredient in Model[i].Ingredients.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+                                    {
+                                        <li>@ingredient.Trim()</li>
+                                    }
+                                </ol>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-6 d-flex flex-column gap-1 p-1">
+            @for (var i = 1; i < Model.Count; i += 2)
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex flex-column">
+                            <input type="radio" name="selection" data-recipe_id="@Model[i].ID" data-recipe_name="@Model[i].Name" data-recipe_ingredients="@Model[i].Ingredients">
+                            <h1 class="text-center">@Model[i].Name</h1>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-row">
+                            <img width="200" height="150" src="@string.Concat("/Content/Images/", Model[i].ImageFile)">
+                            <div class="d-flex flex-column" style="margin-left: 15%;">
+                                <h3 class="card-title">Ingredients</h3>
+                                <ol>
+                                    @foreach (var ingredient in Model[i].Ingredients.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+                                    {
+                                        <li>@ingredient.Trim()</li>
+                                    }
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="text-center text-white">
+        <h3>There are currently no recipe's added to the system.</h3>
+    </div>
+}
+
+@section scripts
+{
+    <script>
+        //auto select first radio button
+        $('input[name=selection]:first').attr('checked', true);
+        var selectedRecipe = [
+            $('input[name=selection]:first').data('recipe_id'),
+            $('input[name=selection]:first').data('recipe_name'),
+            $('input[name=selection]:first').data('recipe_ingredients')
+        ];
+
+        $('input[name="selection"').change(function () {
+            var selection = $(this);
+            selectedRecipe = [
+                selection.data('recipe_id'),
+                selection.data('recipe_name'),
+                selection.data('recipe_ingredients')
+            ];
+        });
+
+        $('#addNewBtn').click(function () {
+            $('#addForm input[name="Name"]').val('');
+            $('#addForm input[name="Image"]').val('');
+            $('#addForm textarea[name="Ingredients"]').val('');
+        });
+
+        $('#editBtn').click(function () {
+            $('#editForm input[name="ID"]').val(selectedRecipe[0]);
+            $('#editForm input[name="Name"]').val(selectedRecipe[1]);
+            $('#editForm textarea[name="Ingredients"]').val(selectedRecipe[2]);
+        });
+
+        $('#deleteBtn').click(function () {
+            $('#deleteForm input[name="ID"]').val(selectedRecipe[0]);
+            $('#deleteForm p label[name="Name"]').text(selectedRecipe[1]);
+        });
+    </script>
+}
